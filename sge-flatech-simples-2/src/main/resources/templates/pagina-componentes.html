@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Componentes - SGE Flatech</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="header"><div class="header-content"><div class="logo"><span class="logo-icon">🏭</span><span>SGE Flatech</span></div></div></header>
+    <nav class="nav"><div class="nav-content"><a href="/" class="nav-link">🏠 Início</a><a href="/clientes" class="nav-link">👥 Clientes</a><a href="/componentes" class="nav-link active">🔧 Componentes</a><a href="/ordens" class="nav-link">📦 Ordens</a><a href="/producao" class="nav-link">🏭 Produção</a><a href="/financeiro" class="nav-link">💰 Financeiro</a></div></nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">➕ Novo Componente</h2></div>
+            <form th:action="@{/componentes/salvar}" method="post">
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Nome *</label><input type="text" name="nome" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Tipo *</label><input type="text" name="tipo" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Quantidade *</label><input type="number" name="quantidade" class="form-control" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Valor Unit (R$) *</label><input type="number" name="valorUnitario" class="form-control" step="0.01" required></div>
+                    <div class="form-group"><label class="form-label">Fornecedor</label><input type="text" name="fornecedor" class="form-control"></div>
+                </div>
+                <button type="submit" class="btn btn-success">✓ Salvar</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">📦 Estoque</h2><span th:text="'Total: ' + ${componentes.size()}"></span></div>
+            <table class="table" th:if="${!componentes.isEmpty()}">
+                <thead><tr><th>ID</th><th>Nome</th><th>Tipo</th><th>Qtd</th><th>Valor Unit.</th><th>Fornecedor</th><th>Ações</th></tr></thead>
+                <tbody>
+                    <tr th:each="comp : ${componentes}">
+                        <td th:text="${comp.id}"></td>
+                        <td th:text="${comp.nome}"></td>
+                        <td th:text="${comp.tipo}"></td>
+                        <td th:text="${comp.quantidade}"></td>
+                        <td th:text="'R$ ' + ${#numbers.formatDecimal(comp.valorUnitario, 1, 2)}"></td>
+                        <td th:text="${comp.fornecedor}"></td>
+                        <td><a th:href="@{/componentes/deletar/{id}(id=${comp.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Deletar?')">🗑️</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="empty-state" th:if="${componentes.isEmpty()}"><div class="empty-state-icon">📭</div><h3>Nenhum componente</h3></div>
+        </div>
+    </div>
+    <footer class="footer"><p>&copy; 2026 SGE Flatech</p></footer>
+</body>
+</html>
