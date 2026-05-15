@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes - SGE Flatech</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo"><span class="logo-icon">🏭</span><span>SGE Flatech</span></div>
+        </div>
+    </header>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="/" class="nav-link">🏠 Início</a>
+            <a href="/clientes" class="nav-link active">👥 Clientes</a>
+            <a href="/componentes" class="nav-link">🔧 Componentes</a>
+            <a href="/ordens" class="nav-link">📦 Ordens</a>
+            <a href="/producao" class="nav-link">🏭 Produção</a>
+            <a href="/financeiro" class="nav-link">💰 Financeiro</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">➕ Novo Cliente</h2></div>
+            <form th:action="@{/clientes/salvar}" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nome *</label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CPF/CNPJ *</label>
+                        <input type="text" name="cpfCnpj" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Telefone</label>
+                        <input type="text" name="telefone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cidade</label>
+                        <input type="text" name="cidade" class="form-control">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">✓ Salvar Cliente</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">📋 Lista de Clientes</h2>
+                <span th:text="'Total: ' + ${clientes.size()}"></span>
+            </div>
+            <table class="table" th:if="${!clientes.isEmpty()}">
+                <thead>
+                    <tr><th>ID</th><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>Email</th><th>Cidade</th><th>Ações</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cliente : ${clientes}">
+                        <td th:text="${cliente.id}"></td>
+                        <td th:text="${cliente.nome}"></td>
+                        <td th:text="${cliente.cpfCnpj}"></td>
+                        <td th:text="${cliente.telefone}"></td>
+                        <td th:text="${cliente.email}"></td>
+                        <td th:text="${cliente.cidade}"></td>
+                        <td><a th:href="@{/clientes/deletar/{id}(id=${cliente.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Deletar?')">🗑️ Deletar</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="empty-state" th:if="${clientes.isEmpty()}">
+                <div class="empty-state-icon">📭</div>
+                <h3>Nenhum cliente cadastrado</h3>
+            </div>
+        </div>
+    </div>
+    <footer class="footer"><p>&copy; 2026 SGE Flatech</p></footer>
+</body>
+</html>

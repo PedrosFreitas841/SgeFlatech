@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Produção - SGE Flatech</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="header"><div class="header-content"><div class="logo"><span class="logo-icon">🏭</span><span>SGE Flatech</span></div></div></header>
+    <nav class="nav"><div class="nav-content"><a href="/" class="nav-link">🏠 Início</a><a href="/clientes" class="nav-link">👥 Clientes</a><a href="/componentes" class="nav-link">🔧 Componentes</a><a href="/ordens" class="nav-link">📦 Ordens</a><a href="/producao" class="nav-link active">🏭 Produção</a><a href="/financeiro" class="nav-link">💰 Financeiro</a></div></nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">➕ Registrar Etapa</h2></div>
+            <form th:action="@{/producao/salvar}" method="post">
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Ordem ID *</label><input type="number" name="ordemProducaoId" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Etapa *</label><select name="etapa" class="form-control" required><option>Montagem</option><option>Soldagem</option><option>Teste</option><option>Acabamento</option></select></div>
+                    <div class="form-group"><label class="form-label">Operador *</label><input type="text" name="operador" class="form-control" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Data Início *</label><input type="datetime-local" name="dataInicio" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Data Fim</label><input type="datetime-local" name="dataFim" class="form-control"></div>
+                    <div class="form-group"><label class="form-label">Status *</label><select name="status" class="form-control" required><option value="em_andamento">Em Andamento</option><option value="concluida">Concluída</option><option value="pausada">Pausada</option></select></div>
+                </div>
+                <div class="form-group"><label class="form-label">Observações</label><textarea name="observacoes" class="form-control" rows="2"></textarea></div>
+                <button type="submit" class="btn btn-success">✓ Registrar</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">📋 Produção</h2><span th:text="'Total: ' + ${producoes.size()}"></span></div>
+            <table class="table" th:if="${!producoes.isEmpty()}">
+                <thead><tr><th>ID</th><th>Ordem</th><th>Etapa</th><th>Operador</th><th>Início</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody>
+                    <tr th:each="prod : ${producoes}">
+                        <td th:text="${prod.id}"></td>
+                        <td th:text="${prod.ordemProducaoId}"></td>
+                        <td th:text="${prod.etapa}"></td>
+                        <td th:text="${prod.operador}"></td>
+                        <td th:text="${#temporals.format(prod.dataInicio, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td><span th:if="${prod.status == 'em_andamento'}" class="badge badge-info">Em Andamento</span><span th:if="${prod.status == 'concluida'}" class="badge badge-success">Concluída</span></td>
+                        <td><a th:href="@{/producao/deletar/{id}(id=${prod.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Deletar?')">🗑️</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="empty-state" th:if="${producoes.isEmpty()}"><div class="empty-state-icon">📭</div><h3>Nenhum registro</h3></div>
+        </div>
+    </div>
+    <footer class="footer"><p>&copy; 2026 SGE Flatech</p></footer>
+</body>
+</html>

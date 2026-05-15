@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ordens - SGE Flatech</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="header"><div class="header-content"><div class="logo"><span class="logo-icon">🏭</span><span>SGE Flatech</span></div></div></header>
+    <nav class="nav"><div class="nav-content"><a href="/" class="nav-link">🏠 Início</a><a href="/clientes" class="nav-link">👥 Clientes</a><a href="/componentes" class="nav-link">🔧 Componentes</a><a href="/ordens" class="nav-link active">📦 Ordens</a><a href="/producao" class="nav-link">🏭 Produção</a><a href="/financeiro" class="nav-link">💰 Financeiro</a></div></nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">➕ Nova Ordem</h2></div>
+            <form th:action="@{/ordens/salvar}" method="post">
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Código *</label><input type="text" name="codigo" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Cliente ID *</label><input type="number" name="clienteId" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Data Emissão *</label><input type="date" name="dataEmissao" class="form-control" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Data Prevista *</label><input type="date" name="dataPrevista" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Status *</label><select name="status" class="form-control" required><option value="pendente">Pendente</option><option value="em_producao">Em Produção</option><option value="concluida">Concluída</option></select></div>
+                    <div class="form-group"><label class="form-label">Prioridade *</label><select name="prioridade" class="form-control" required><option value="baixa">Baixa</option><option value="media">Média</option><option value="alta">Alta</option></select></div>
+                </div>
+                <div class="form-group"><label class="form-label">Descrição</label><textarea name="descricao" class="form-control" rows="2"></textarea></div>
+                <button type="submit" class="btn btn-success">✓ Criar Ordem</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">📋 Ordens</h2><span th:text="'Total: ' + ${ordens.size()}"></span></div>
+            <table class="table" th:if="${!ordens.isEmpty()}">
+                <thead><tr><th>ID</th><th>Código</th><th>Cliente</th><th>Emissão</th><th>Previsão</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead>
+                <tbody>
+                    <tr th:each="ordem : ${ordens}">
+                        <td th:text="${ordem.id}"></td>
+                        <td th:text="${ordem.codigo}"></td>
+                        <td th:text="${ordem.clienteId}"></td>
+                        <td th:text="${#temporals.format(ordem.dataEmissao, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#temporals.format(ordem.dataPrevista, 'dd/MM/yyyy')}"></td>
+                        <td><span th:if="${ordem.status == 'pendente'}" class="badge badge-warning">Pendente</span><span th:if="${ordem.status == 'em_producao'}" class="badge badge-info">Em Produção</span><span th:if="${ordem.status == 'concluida'}" class="badge badge-success">Concluída</span></td>
+                        <td><span th:if="${ordem.prioridade == 'baixa'}" class="badge badge-info">Baixa</span><span th:if="${ordem.prioridade == 'media'}" class="badge badge-warning">Média</span><span th:if="${ordem.prioridade == 'alta'}" class="badge badge-danger">Alta</span></td>
+                        <td><a th:href="@{/ordens/deletar/{id}(id=${ordem.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Deletar?')">🗑️</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="empty-state" th:if="${ordens.isEmpty()}"><div class="empty-state-icon">📭</div><h3>Nenhuma ordem</h3></div>
+        </div>
+    </div>
+    <footer class="footer"><p>&copy; 2026 SGE Flatech</p></footer>
+</body>
+</html>
