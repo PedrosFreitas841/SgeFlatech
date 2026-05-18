@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Flatech</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo"><span class="logo-icon">🏭</span><span>SGE Flatech</span></div>
+            <div class="user-info"><span>Sistema de Gestão Eletrônica</span></div>
+        </div>
+    </header>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="/" class="nav-link active">🏠 Início</a>
+            <a href="/clientes" class="nav-link">👥 Clientes</a>
+            <a href="/componentes" class="nav-link">🔧 Componentes</a>
+            <a href="/ordens" class="nav-link">📦 Ordens</a>
+            <a href="/producao" class="nav-link">🏭 Produção</a>
+            <a href="/financeiro" class="nav-link">💰 Financeiro</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header"><h1 class="card-title">📊 Dashboard</h1></div>
+            <div class="dashboard-grid">
+                <a href="/clientes" class="dashboard-card"><div class="dashboard-card-icon">👥</div><h3 class="dashboard-card-title">Clientes</h3><p style="color: #7f8c8d;">Gerenciar clientes</p></a>
+                <a href="/componentes" class="dashboard-card"><div class="dashboard-card-icon">🔧</div><h3 class="dashboard-card-title">Componentes</h3><p style="color: #7f8c8d;">Controle de estoque</p></a>
+                <a href="/ordens" class="dashboard-card"><div class="dashboard-card-icon">📦</div><h3 class="dashboard-card-title">Ordens de Produção</h3><p style="color: #7f8c8d;">Gestão de ordens</p></a>
+                <a href="/producao" class="dashboard-card"><div class="dashboard-card-icon">🏭</div><h3 class="dashboard-card-title">Produção</h3><p style="color: #7f8c8d;">Acompanhar produção</p></a>
+                <a href="/financeiro" class="dashboard-card"><div class="dashboard-card-icon">💰</div><h3 class="dashboard-card-title">Financeiro</h3><p style="color: #7f8c8d;">Controle financeiro</p></a>
+            </div>
+        </div>
+        <div class="card">
+            <h2 style="color: #2c3e50; margin-bottom: 1rem;">🚀 Bem-vindo ao SGE Flatech!</h2>
+            <p style="color: #7f8c8d; line-height: 1.8;">Sistema de Gestão Eletrônica desenvolvido com <strong>MVC tradicional</strong>. Escolha um módulo acima para começar.</p>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2026 SGE Flatech - Sistema de Gestão Eletrônica</p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">Desenvolvido com DAO + JDBC + Spring MVC</p>
+    </footer>
+</body>
+</html>

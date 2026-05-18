@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Financeiro - SGE Flatech</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="header"><div class="header-content"><div class="logo"><span class="logo-icon">🏭</span><span>SGE Flatech</span></div></div></header>
+    <nav class="nav"><div class="nav-content"><a href="/" class="nav-link">🏠 Início</a><a href="/clientes" class="nav-link">👥 Clientes</a><a href="/componentes" class="nav-link">🔧 Componentes</a><a href="/ordens" class="nav-link">📦 Ordens</a><a href="/producao" class="nav-link">🏭 Produção</a><a href="/financeiro" class="nav-link active">💰 Financeiro</a></div></nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">➕ Nova Movimentação</h2></div>
+            <form th:action="@{/financeiro/salvar}" method="post">
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Tipo *</label><select name="tipo" class="form-control" required><option value="entrada">💵 Entrada</option><option value="saida">💸 Saída</option></select></div>
+                    <div class="form-group"><label class="form-label">Categoria *</label><select name="categoria" class="form-control" required><option>Venda</option><option>Compra</option><option>Salário</option><option>Outros</option></select></div>
+                    <div class="form-group"><label class="form-label">Valor (R$) *</label><input type="number" name="valor" class="form-control" step="0.01" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Data *</label><input type="date" name="dataMovimento" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Ordem ID</label><input type="number" name="ordemProducaoId" class="form-control"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Descrição *</label><textarea name="descricao" class="form-control" rows="2" required></textarea></div>
+                <button type="submit" class="btn btn-success">✓ Registrar</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">📊 Movimentações</h2><span th:text="'Total: ' + ${registros.size()}"></span></div>
+            <table class="table" th:if="${!registros.isEmpty()}">
+                <thead><tr><th>ID</th><th>Data</th><th>Tipo</th><th>Categoria</th><th>Valor</th><th>Descrição</th><th>Ações</th></tr></thead>
+                <tbody>
+                    <tr th:each="reg : ${registros}">
+                        <td th:text="${reg.id}"></td>
+                        <td th:text="${#temporals.format(reg.dataMovimento, 'dd/MM/yyyy')}"></td>
+                        <td><span th:if="${reg.tipo == 'entrada'}" class="badge badge-success">Entrada</span><span th:if="${reg.tipo == 'saida'}" class="badge badge-danger">Saída</span></td>
+                        <td th:text="${reg.categoria}"></td>
+                        <td th:text="'R$ ' + ${#numbers.formatDecimal(reg.valor, 1, 2)}" th:style="${reg.tipo == 'entrada'} ? 'color: #27ae60; font-weight: bold;' : 'color: #e74c3c; font-weight: bold;'"></td>
+                        <td th:text="${reg.descricao}"></td>
+                        <td><a th:href="@{/financeiro/deletar/{id}(id=${reg.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Deletar?')">🗑️</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="empty-state" th:if="${registros.isEmpty()}"><div class="empty-state-icon">📭</div><h3>Nenhuma movimentação</h3></div>
+        </div>
+    </div>
+    <footer class="footer"><p>&copy; 2026 SGE Flatech</p></footer>
+</body>
+</html>

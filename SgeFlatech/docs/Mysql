@@ -1,0 +1,230 @@
+-- =====================================================
+-- SGE Flatech - Schema do Banco de Dados
+-- Baseado no schema fornecido pelo usuário
+-- =====================================================
+
+-- Criar banco de dados
+CREATE DATABASE IF NOT EXISTS sge_flatech CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE sge_flatech;
+
+-- =====================================================
+-- TABELAS PRINCIPAIS
+-- =====================================================
+
+-- Tabela de Clientes
+CREATE TABLE cliente (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf_cnpj VARCHAR(20),
+    telefone VARCHAR(20),
+    email VARCHAR(100),
+    cidade VARCHAR(50)
+);
+
+-- Tabela de Componentes
+CREATE TABLE componente (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    referencia VARCHAR(50),
+    fornecedor VARCHAR(100),
+    quantidade INT NOT NULL,
+    quantidade_minima INT NOT NULL
+);
+
+-- Tabela de Ordens de Produção
+CREATE TABLE ordem_producao (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(20),
+    cliente_id BIGINT,
+    tipo_placa VARCHAR(50),
+    quantidade INT,
+    status VARCHAR(30),
+    prioridade VARCHAR(20),
+    prazo DATE,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+);
+
+-- Tabela de Produção (execução)
+CREATE TABLE producao (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ordem_id BIGINT,
+    operador VARCHAR(100),
+    maquina VARCHAR(50),
+    tempo_inicio TIMESTAMP,
+    tempo_fim TIMESTAMP,
+    status VARCHAR(30),
+
+    FOREIGN KEY (ordem_id) REFERENCES ordem_producao(id)
+);
+
+-- Tabela de Consumo de Componentes
+CREATE TABLE consumo_componente (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ordem_id BIGINT,
+    componente_id BIGINT,
+    quantidade_necessaria INT,
+    quantidade_usada INT,
+
+    FOREIGN KEY (ordem_id) REFERENCES ordem_producao(id),
+    FOREIGN KEY (componente_id) REFERENCES componente(id)
+);
+
+-- Tabela Financeiro
+CREATE TABLE financeiro (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ordem_id BIGINT,
+    valor DECIMAL(10,2),
+    status VARCHAR(20),
+    data_pagamento DATE,
+
+    FOREIGN KEY (ordem_id) REFERENCES ordem_producao(id)
+);
+
+-- Tabela de Usuários
+CREATE TABLE usuario (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100),
+    email VARCHAR(100),
+    senha VARCHAR(100),
+    tipo VARCHAR(20)
+);
+
+-- NOVA TABELA: Log de Alertas (necessária para o trigger)
+CREATE TABLE log_alerta (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    mensagem VARCHAR(255) NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =====================================================
+-- STORED PROCEDURES
+-- =====================================================
+
+-- Procedure: Contar ordens em andamento
+DELIMITER $$
+CREATE PROCEDURE ordens_em_andamento()
+BEGIN
+    SELECT COUNT(*) FROM ordem_producao
+    WHERE status = 'EM_ANDAMENTO';
+END$$
+DELIMITER ;
+
+-- Procedure: Listar componentes críticos
+DELIMITER $$
+CREATE PROCEDURE componentes_criticos()
+BEGIN
+    SELECT * FROM componente
+    WHERE quantidade < quantidade_minima;
+END$$
+DELIMITER ;
+
+-- Procedure: Contar produção do mês
+DELIMITER $$
+CREATE PROCEDURE producao_mes()
+BEGIN
+    SELECT COUNT(*) FROM ordem_producao
+    WHERE MONTH(data_criacao) = MONTH(CURRENT_DATE())
+    AND YEAR(data_criacao) = YEAR(CURRENT_DATE());
+END$$
+DELIMITER ;
+
+-- =====================================================
+-- TRIGGERS
+-- =====================================================
+
+-- Trigger: Alerta de estoque baixo
+DELIMITER $$
+CREATE TRIGGER alerta_estoque_baixo
+AFTER UPDATE ON componente
+FOR EACH ROW
+BEGIN
+    IF NEW.quantidade < NEW.quantidade_minima THEN
+        INSERT INTO log_alerta(mensagem)
+        VALUES (CONCAT('Estoque baixo: ', NEW.nome, ' - Quantidade: ', NEW.quantidade));
+    END IF;
+END$$
+DELIMITER ;
+
+-- =====================================================
+-- DADOS DE EXEMPLO (OPCIONAL)
+-- =====================================================
+
+-- Inserir clientes de exemplo
+INSERT INTO cliente (nome, cpf_cnpj, telefone, email, cidade) VALUES
+('TechCorp LTDA', '12.345.678/0001-90', '(11) 98765-4321', 'contato@techcorp.com', 'São Paulo'),
+('Eletrônicos Silva', '23.456.789/0001-01', '(21) 97654-3210', 'silva@eletronicos.com', 'Rio de Janeiro'),
+('Indústrias ABC', '34.567.890/0001-12', '(31) 96543-2109', 'comercial@abc.com.br', 'Belo Horizonte'),
+('Automação XYZ', '45.678.901/0001-23', '(41) 95432-1098', 'xyz@automacao.com', 'Curitiba'),
+('Smart Devices', '56.789.012/0001-34', '(51) 94321-0987', 'info@smartdevices.com', 'Porto Alegre');
+
+-- Inserir componentes de exemplo
+INSERT INTO componente (nome, referencia, fornecedor, quantidade, quantidade_minima) VALUES
+('Resistor 10kΩ 0805', 'R-10K-0805', 'Componentes Brasil', 4500, 1000),
+('Capacitor 100nF 0805', 'C-100N-0805', 'Componentes Brasil', 3200, 1000),
+('LED SMD 0805 Verde', 'LED-G-0805', 'LED Tech', 850, 1000),
+('IC ATmega328P', 'IC-ATMEGA328', 'Microchip Distribuidora', 45, 100),
+('Resistor 1kΩ 0805', 'R-1K-0805', 'Componentes Brasil', 5200, 1000),
+('Transistor BC547', 'TR-BC547', 'Semicondutores SP', 280, 500),
+('Capacitor 10µF 1206', 'C-10U-1206', 'Capacitores LTDA', 150, 500),
+('Crystal 16MHz', 'XTAL-16M', 'Osciladores BR', 95, 200);
+
+-- Inserir ordens de produção de exemplo
+INSERT INTO ordem_producao (codigo, cliente_id, tipo_placa, quantidade, status, prioridade, prazo) VALUES
+('OP-2026-001', 1, 'SMD', 50, 'EM_ANDAMENTO', 'ALTA', '2026-05-20'),
+('OP-2026-002', 2, 'PTH', 100, 'EM_ANDAMENTO', 'MEDIA', '2026-05-25'),
+('OP-2026-003', 3, 'SMD', 30, 'EM_ANDAMENTO', 'ALTA', '2026-05-15'),
+('OP-2026-004', 4, 'PTH', 200, 'ATRASADA', 'ALTA', '2026-05-10'),
+('OP-2026-005', 1, 'SMD', 75, 'FINALIZADA', 'MEDIA', '2026-05-05');
+
+-- Inserir registros financeiros
+INSERT INTO financeiro (ordem_id, valor, status, data_pagamento) VALUES
+(1, 12500.00, 'PENDENTE', NULL),
+(2, 8900.00, 'PENDENTE', NULL),
+(3, 15800.00, 'PAGO', '2026-05-15'),
+(5, 9750.00, 'PAGO', '2026-05-10');
+
+-- Inserir usuários de exemplo (senha: admin123)
+INSERT INTO usuario (nome, email, senha, tipo) VALUES
+('Administrador', 'admin@flatech.com', 'admin123', 'ADMIN'),
+('João Silva', 'joao@flatech.com', 'operador123', 'OPERADOR');
+
+-- Inserir produção de exemplo
+INSERT INTO producao (ordem_id, operador, maquina, tempo_inicio, status) VALUES
+(1, 'João Silva', 'SMD-01', NOW(), 'EM_EXECUCAO');
+
+-- Inserir consumo de componentes
+INSERT INTO consumo_componente (ordem_id, componente_id, quantidade_necessaria, quantidade_usada) VALUES
+(1, 1, 200, 128),
+(1, 2, 150, 96),
+(1, 3, 50, 32),
+(1, 4, 50, 32);
+
+-- =====================================================
+-- ÍNDICES PARA PERFORMANCE
+-- =====================================================
+
+CREATE INDEX idx_ordem_status ON ordem_producao(status);
+CREATE INDEX idx_ordem_prazo ON ordem_producao(prazo);
+CREATE INDEX idx_componente_referencia ON componente(referencia);
+CREATE INDEX idx_financeiro_status ON financeiro(status);
+
+-- =====================================================
+-- FIM DO SCRIPT
+-- =====================================================
+
+SELECT 'Banco de dados SGE Flatech criado com sucesso!' AS mensagem;
+
+
+
+
+
+CREATE TABLE componente (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    tipo VARCHAR(100),
+    quantidade INT NOT NULL,
+    valor_unitario DOUBLE NOT NULL,
+    fornecedor VARCHAR(150)
+);
