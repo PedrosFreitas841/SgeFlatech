@@ -3,17 +3,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.5</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.flatech</groupId>
     <artifactId>sge-simples</artifactId>
     <version>1.0.0</version>
+
     <name>SGE Flatech Simples</name>
     <description>Sistema de Gestão - MVC Tradicional</description>
 
@@ -22,19 +25,20 @@
     </properties>
 
     <dependencies>
+
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Thymeleaf (para HTML) -->
+        <!-- Thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <!-- MySQL Driver (JDBC puro) -->
+        <!-- MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -44,9 +48,11 @@
         <!-- DevTools (opcional) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-devtools</artifactId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -57,4 +63,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
